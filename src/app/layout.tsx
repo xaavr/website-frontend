@@ -13,7 +13,6 @@ const jost = Jost({
 const outfit = Outfit({
   variable: "--font-outfit",
   subsets: ["latin"],
-  weight: ["200", "300", "400", "700"],
 });
 
 const geistSans = Geist({
