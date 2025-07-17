@@ -7,79 +7,113 @@ gsap.registerPlugin(ScrollToPlugin);
 export default function Home() {
   const nameRef = useRef(null);
   const aboutRef = useRef(null);
-  const nextSectionRef = useRef(null);
-  const nameTileRef = useRef(null);
-  const [showNextSection, setShowNextSection] = useState(false);
+  const aboutHoverRef = useRef(null);
+  const aboutGroupRef = useRef(null);
+  const backgroundTileRef = useRef(null); // Changed from nameTileRef to backgroundTileRef
+  const [showAboutEffects, setShowAboutEffects] = useState(false);
+
+  const [isExplorePressed, setIsExplorePressed] = useState(false); // Add a new state variable
+  const hometextRef = useRef(null);
+  // Add these state variables to track when elements should be removed
+  const [showName, setShowName] = useState(true);
+  const [showButton, setShowButton] = useState(true);
 
   useEffect(() => {
-    // Animate tile first
-    gsap.fromTo(
-      nameTileRef.current,
-      { opacity: 0 }, 
-      { opacity: 0.75, duration: 1.5, delay: 0.5 }
-    );
-    
     // Then animate name
     gsap.fromTo(
       nameRef.current,
       { opacity: 0 },
-      { opacity: 1, duration: 1.5, delay: 1.5 }  // Starts after tile animation
+      { opacity: 1, duration: 1.5, delay: 0.5 }
     );
-    
-    // Finally animate about button
+
+    // Animate about button
     gsap.fromTo(
-      aboutRef.current,
+      aboutGroupRef.current,
       { opacity: 0 },
-      { opacity: 1, duration: 1.5, delay: 2.5 }  // Starts after name animation
+      { 
+        opacity: 1, 
+        duration: .5,
+        delay: 1.5,
+        onComplete: () => setShowAboutEffects(true)
+      }
     );
   }, []);
 
   const handleAboutClick = () => {
-    setShowNextSection(true); // Show the section when clicked
+    if (aboutRef.current) {
+      aboutRef.current.classList.remove('transition-colors');
+    }
+
+    const tl = gsap.timeline();
     
-    // Small timeout to ensure the section is rendered before scrolling
-    setTimeout(() => {
-      gsap.to(window, {
-        duration: 2,
-        scrollTo: { y: nextSectionRef.current, offsetY: 0 },
-        ease: "power2.inOut"
-      });
-    }, 100);
+    // Step 1: Animate background to white AND text to blue CONCURRENTLY
+    tl.to(backgroundTileRef.current, {
+      backgroundColor: "white",
+      duration: 1.5
+    })
+    .to([nameRef.current, aboutRef.current], { 
+      color: "#1976D2", // Change text to blue
+      duration: 2.25
+    }, "<-0.25"); // The "<" makes this animation start at the same time as the previous one
+
+    // Step 2: Animate the text back to white
+    tl.to([nameRef.current, aboutRef.current], {
+      color: "#FFFFFF", // Change text back to white
+      duration: 1,
+      onComplete: () => {
+        // After the fade to white is done, remove them from the DOM
+        setShowName(false);
+        setShowButton(false);
+      }}, ">0.5");
+
+    // Step 3: Wait until text is removed, THEN fade out background to a border
+    tl.to(backgroundTileRef.current, {
+      backgroundColor: "transparent",
+      boxShadow: "none",
+      border: "2px solid #1976D2",
+      duration: 1
+    }, "+=0.5"); // Start 0.5s after the previous animation completes
   };
 
+  // Ensure the font is applied to each text element
   return (
-    <div className="bg-[#87A5B0] font-[var(--font-outfit)]">
+    <div className="bg-[#000000] text-white">
       <section className="h-screen flex items-center justify-center">
-        {/* Name tile */}
-        <div style={{ opacity: 0 }} ref={nameTileRef} className="bg-[#63578B] rounded-xl shadow-xl w-[40%] h-[60%] flex flex-col items-center justify-center gap-8 p-8">
-          {/* Name inside the tile */}
-          <div style={{ opacity: 0 }} ref={nameRef} className="text-7xl font-extralight text-white">
-            Xavier Arnold
-          </div>
-          
-          {/* About button inside the tile */}
-          <div className="group relative px-5 cursor-pointer active:shadow-inner active:translate-y-1 transition-all duration-150">
-            <div
-              style={{ opacity: 0 }}
-              ref={aboutRef}
-              className="content-center text-2xl font-extralight z-10 relative"
-              onClick={handleAboutClick}
+        {/* Single background tile with content directly on it */}
+        <div 
+          ref={backgroundTileRef} 
+          className="bg-[#000000] rounded-xl shadow-md w-[40%] h-[90%] flex flex-col items-center justify-center gap-8 p-8 relative"
+        >
+          {/* Only render name if showName is true */}
+          {showName && (
+            <div 
+              style={{ opacity: 0 }} 
+              ref={nameRef} 
+              className="text-7xl font-[var(--font-azeret-mono)] font-[300]"
             >
-              About
+              Xavier Arnold
             </div>
-            <div className="absolute inset-0 bg-[#3E3F43] opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-xl shadow-md z-0"></div>
-          </div>
+          )}
+          
+          {/* Only render button if showButton is true */}
+          {showButton && (
+            <div 
+              onClick={handleAboutClick} 
+              ref={aboutGroupRef}
+              style={{ opacity: 0 }}
+              className="group relative px-5 cursor-pointer active:translate-y-1 transition-all duration-150"
+            >
+              <div
+                ref={aboutRef}
+                className="content-center text-2xl font-[var(--font-azeret-mono)] font-[300] z-10 relative group-hover:text-[#000000] transition-colors duration-500"
+              >
+                Explore
+              </div>
+              {showAboutEffects && <div className="absolute inset-0 bg-[#FFFFFF] opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-md shadow-md z-0"></div>}
+            </div>
+          )}
         </div>
       </section>
-      
-      {/* Only render the next section if showNextSection is true */}
-      {showNextSection && (
-        <section ref={nextSectionRef} className="w-full h-screen flex items-center justify-center bg-[#87A5B0]">
-          <div className='bg-[#63578B] rounded-xl shadow-xl w-[90%] h-[90%] flex items-center justify-center text-white text-2xl'>
-            next
-          </div>
-        </section>
-      )}
     </div>
   );
 }

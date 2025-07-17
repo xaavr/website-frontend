@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { Jost } from "next/font/google";
 import { Outfit } from "next/font/google";
+import { Azeret_Mono } from "next/font/google"; // Import Azeret Mono
 import "./globals.css";
 
 const jost = Jost({
@@ -13,6 +14,12 @@ const jost = Jost({
 const outfit = Outfit({
   variable: "--font-outfit",
   subsets: ["latin"],
+});
+
+const azeretMono = Azeret_Mono({
+  variable: "--font-azeret-mono",
+  subsets: ["latin"],
+  weight: ["300", "400", "500", "700"],
 });
 
 const geistSans = Geist({
@@ -38,7 +45,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${outfit.variable} antialiased`}
+        className={`${outfit.variable} ${azeretMono.variable} antialiased`}
       >
         {children}
       </body>
