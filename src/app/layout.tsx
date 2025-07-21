@@ -1,36 +1,8 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
-import { Jost } from "next/font/google";
-import { Outfit } from "next/font/google";
-import { Azeret_Mono } from "next/font/google"; // Import Azeret Mono
+import { Inter } from "next/font/google";
 import "./globals.css";
 
-const jost = Jost({
-  variable: "--font-jost",
-  subsets: ["latin"],
-  weight: ["400", "700"],
-});
-
-const outfit = Outfit({
-  variable: "--font-outfit",
-  subsets: ["latin"],
-});
-
-const azeretMono = Azeret_Mono({
-  variable: "--font-azeret-mono",
-  subsets: ["latin"],
-  weight: ["300", "400", "500", "700"],
-});
-
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
+const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -44,11 +16,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body
-        className={`${outfit.variable} ${azeretMono.variable} antialiased`}
-      >
-        {children}
-      </body>
+      <body className={inter.className}>{children}</body>
     </html>
   );
 }
